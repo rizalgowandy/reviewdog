@@ -3,7 +3,7 @@ package bitbucket
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	insights "github.com/reva2/bitbucket-insights-api"
@@ -75,7 +75,7 @@ func (c *ServerAPIClient) deleteReport(ctx context.Context, report *ReportReques
 		Execute()
 
 	if err := c.checkAPIError(err, resp, http.StatusNoContent); err != nil {
-		return fmt.Errorf("failted to delete code insights report: %w", err)
+		return fmt.Errorf("failed to delete code insights report: %w", err)
 	}
 
 	return nil
@@ -83,11 +83,11 @@ func (c *ServerAPIClient) deleteReport(ctx context.Context, report *ReportReques
 
 func (c *ServerAPIClient) checkAPIError(err error, resp *http.Response, expectedCode int) error {
 	if err != nil {
-		return fmt.Errorf("bitubucket API error: %w", err)
+		return fmt.Errorf("bitbucket Server API error: %w", err)
 	}
 
 	if resp != nil && resp.StatusCode != expectedCode {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 
 		return UnexpectedResponseError{
 			Code: resp.StatusCode,
