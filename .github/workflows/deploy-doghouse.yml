@@ -2,7 +2,7 @@ name: Deploy doghouse
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
   workflow_dispatch:
 
 jobs:
@@ -11,12 +11,13 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 50 # Need git history for testing.
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.15
+          # must sync doghouse/appengine/app.yaml
+          go-version: "1.21"
       - run: go test -v -race  ./...
   deploy:
     permissions:
@@ -28,12 +29,14 @@ jobs:
         shell: bash
         working-directory: ./doghouse/appengine/
     steps:
-      - uses: actions/checkout@v2
-      - uses: google-github-actions/setup-gcloud@v0.2.1
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2.1.4
         with:
           project_id: review-dog
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
       - name: Decrypt keys
         env:
           GAE_KEYRING_NAME: reviewdog-doghouse-deploy
