@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,13 +24,13 @@ line3
 `
 	)
 
-	beforef, err := ioutil.TempFile("", "reviewdog-test")
+	beforef, err := os.CreateTemp("", "reviewdog-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer beforef.Close()
 	defer os.Remove(beforef.Name())
-	afterf, err := ioutil.TempFile("", "reviewdog-test")
+	afterf, err := os.CreateTemp("", "reviewdog-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,10 +83,11 @@ func TestRun_local_nofilter(t *testing.T) {
 	)
 
 	opt := &option{
-		diffCmd:   "", // empty
-		efms:      strslice([]string{`%f(%l,%c): %m`}),
-		diffStrip: 0,
-		reporter:  "local",
+		diffCmd:    "", // empty
+		efms:       strslice([]string{`%f(%l,%c): %m`}),
+		diffStrip:  0,
+		reporter:   "local",
+		filterMode: filter.ModeAdded,
 	}
 
 	stdout := new(bytes.Buffer)
@@ -154,7 +154,7 @@ func TestRun_project(t *testing.T) {
 	})
 
 	t.Run("invalid config", func(t *testing.T) {
-		conffile, err := ioutil.TempFile("", "reviewdog-test")
+		conffile, err := os.CreateTemp("", "reviewdog-test")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -175,7 +175,7 @@ func TestRun_project(t *testing.T) {
 	})
 
 	t.Run("ok", func(t *testing.T) {
-		conffile, err := ioutil.TempFile("", "reviewdog-test")
+		conffile, err := os.CreateTemp("", "reviewdog-test")
 		if err != nil {
 			t.Fatal(err)
 		}

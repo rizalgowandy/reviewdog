@@ -22,7 +22,7 @@ type CheckRequest struct {
 
 	// Branch name.
 	// Optional.
-	// DEPRECATED: No need to fill this field.
+	// Deprecated: No need to fill this field.
 	Branch string `json:"branch,omitempty"`
 
 	// Annotations associated with the repository's commit and Pull Request.
@@ -41,7 +41,7 @@ type CheckRequest struct {
 	//
 	// OutsideDiff represents whether it report results in outside diff or not as
 	// annotations. It's useful only when PullRequest != 0. If PullRequest is
-	// empty, it will always report results all resutls including outside diff
+	// empty, it will always report results all results including outside diff
 	// (because there are no diff!).
 	// Optional.
 	OutsideDiff bool `json:"outside_diff"`
@@ -57,16 +57,6 @@ type CheckResponse struct {
 	// Optional.
 	ReportURL string `json:"report_url,omitempty"`
 
-	// CheckedResults is checked annotations result.
-	// This field is expected to be filled for GitHub Actions integration and
-	// filled when ReportURL is not available. i.e. reviewdog doesn't have write
-	// permission to Check API.
-	// It's also not expected to be passed over network via JSON.
-	// TODO(haya14busa): Consider to move this type to this package to avoid
-	// (cyclic) import.
-	// Optional.
-	CheckedResults []*filter.FilteredDiagnostic `json:"checked_results"`
-
 	// Conclusion of check result, which is same as GitHub's conclusion of Check
 	// API. https://developer.github.com/v3/checks/runs/#parameters-1
 	Conclusion string `json:"conclusion,omitempty"`
@@ -78,15 +68,15 @@ type Annotation struct {
 	// Optional.
 	Diagnostic *rdf.Diagnostic `json:"diagnostic,omitempty"`
 
-	// DEPRECATED fields below. Need to support them for the old reviewdog CLI
+	// Deprecated fields below. Need to support them for the old reviewdog CLI
 	// version.
 
-	// DEPRECATED: Use Diagnostic.
+	// Deprecated: Use Diagnostic.
 	Path string `json:"path,omitempty"`
-	// DEPRECATED: Use Diagnostic.
+	// Deprecated: Use Diagnostic.
 	Line int `json:"line,omitempty"`
-	// DEPRECATED: Use Diagnostic.
+	// Deprecated: Use Diagnostic.
 	Message string `json:"message,omitempty"`
-	// DEPRECATED: Use Diagnostic.
+	// Deprecated: Use Diagnostic.
 	RawMessage string `json:"raw_message,omitempty"`
 }

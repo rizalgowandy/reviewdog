@@ -2,10 +2,10 @@ name: release
 on:
   push:
     branches:
-      - master
+      - $default-branch
       - release-*
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
   pull_request:
     types:
       - labeled
@@ -18,7 +18,7 @@ jobs:
     if: github.event.action != 'labeled'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # Bump version on merging Pull Requests with specific labels.
       # (bump:major,bump:minor,bump:patch)
@@ -35,25 +35,18 @@ jobs:
           if_false: ${{ steps.bumpr.outputs.next_version }}
 
       # Setup Go for building reviewdog binary.
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v5
+        if: "steps.tag.outputs.value != ''"
         with:
-          go-version: 1.17
-
-      # Test goreleaser if the tag is empty.
-      - name: Test goreleaser
-        uses: goreleaser/goreleaser-action@v2
-        if: "steps.tag.outputs.value == ''"
-        with:
-          version: latest
-          args: check
+          go-version-file: "go.mod"
 
       # Create release.
       - name: Create release with goreleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v6
         if: "steps.tag.outputs.value != ''"
         with:
-          version: latest
-          args: release --rm-dist --release-header .github/goreleaser-header.md
+          version: "~> v2"
+          args: release --clean --release-header .github/goreleaser-header.md
         env:
           # Need to use personal access token instead of default token to
           # update https://github.com/reviewdog/homebrew-tap.
@@ -74,6 +67,6 @@ jobs:
     if: github.event.action == 'labeled'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Post bumpr status comment
         uses: haya14busa/action-bumpr@v1
